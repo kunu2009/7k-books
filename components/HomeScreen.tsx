@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { Book } from '../types';
 import { MY_BOOKS, BEST_SELLERS } from '../constants';
@@ -10,8 +9,12 @@ interface HomeScreenProps {
   allBooks: Book[];
 }
 
-const BookCard: React.FC<{ book: Book; onSelect: (book: Book) => void }> = ({ book, onSelect }) => (
-  <div className="flex-shrink-0 w-32 mr-4" onClick={() => onSelect(book)}>
+const BookCard: React.FC<{ book: Book; onSelect: (book: Book) => void; index: number }> = ({ book, onSelect, index }) => (
+  <div 
+    className="flex-shrink-0 w-32 mr-4 animate-fade-in-up" 
+    style={{ animationDelay: `${index * 75}ms` }}
+    onClick={() => onSelect(book)}
+  >
     <img src={book.coverUrl} alt={book.title} className="w-full h-48 object-cover rounded-lg mb-2 shadow-lg" />
     <div className="w-full bg-gray-700 rounded-full h-1.5 mb-2">
       <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: `${book.progress || 0}%` }}></div>
@@ -24,8 +27,12 @@ const BookCard: React.FC<{ book: Book; onSelect: (book: Book) => void }> = ({ bo
   </div>
 );
 
-const BestSellerCard: React.FC<{ book: Book; onSelect: (book: Book) => void }> = ({ book, onSelect }) => (
-  <div className="flex items-center mb-4 cursor-pointer" onClick={() => onSelect(book)}>
+const BestSellerCard: React.FC<{ book: Book; onSelect: (book: Book) => void; index: number }> = ({ book, onSelect, index }) => (
+  <div 
+    className="flex items-center mb-4 cursor-pointer animate-fade-in-up" 
+    style={{ animationDelay: `${index * 75}ms` }}
+    onClick={() => onSelect(book)}
+  >
     <img src={book.coverUrl} alt={book.title} className="w-20 h-28 object-cover rounded-lg mr-4 shadow-md" />
     <div className="flex-grow">
       <h3 className="font-bold text-white">{book.title}</h3>
@@ -49,6 +56,19 @@ const BestSellerCard: React.FC<{ book: Book; onSelect: (book: Book) => void }> =
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectBook }) => {
   const [activeTab, setActiveTab] = useState('Best Seller');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const lowercasedQuery = searchQuery.toLowerCase();
+  
+  const filteredMyBooks = MY_BOOKS.filter(book => 
+    book.title.toLowerCase().includes(lowercasedQuery) || 
+    book.author.toLowerCase().includes(lowercasedQuery)
+  );
+  
+  const filteredBestSellers = BEST_SELLERS.filter(book => 
+    book.title.toLowerCase().includes(lowercasedQuery) || 
+    book.author.toLowerCase().includes(lowercasedQuery)
+  );
 
   return (
     <div className="bg-[#1F1F2B] text-white min-h-screen pb-24">
@@ -63,6 +83,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectBook }) => {
             <span className="font-serif font-extrabold mr-1">K</span> 240 point
           </button>
         </header>
+
+        {/* Search Bar */}
+        <div className="relative mb-8">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Icon name="search" className="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+                type="text"
+                placeholder="Search for a book or author..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-800 text-white placeholder-gray-500 rounded-full py-3 pl-12 pr-10 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                aria-label="Search books"
+            />
+            {searchQuery && (
+                <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                    aria-label="Clear search"
+                >
+                    <Icon name="close" className="w-5 h-5 text-gray-500 hover:text-white" />
+                </button>
+            )}
+        </div>
 
         {/* Action Buttons */}
         <div className="grid grid-cols-3 gap-4 text-center mb-8">
@@ -86,8 +130,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectBook }) => {
             <h2 className="text-xl font-bold">My Book</h2>
             <a href="#" className="text-sm text-gray-400">see more</a>
           </div>
-          <div className="flex overflow-x-auto pb-4">
-            {MY_BOOKS.map(book => <BookCard key={book.id} book={book} onSelect={onSelectBook} />)}
+          <div className="flex overflow-x-auto pb-4" key={`my-books-${searchQuery}`}>
+            {filteredMyBooks.length > 0 ? (
+                filteredMyBooks.map((book, index) => <BookCard key={book.id} book={book} onSelect={onSelectBook} index={index} />)
+            ) : (
+                <p className="text-gray-400 w-full animate-fade-in-up">No books found.</p>
+            )}
           </div>
         </section>
 
@@ -104,8 +152,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectBook }) => {
               </button>
             ))}
           </div>
-          <div>
-            {BEST_SELLERS.map(book => <BestSellerCard key={book.id} book={book} onSelect={onSelectBook} />)}
+          <div key={`best-sellers-${searchQuery}`}>
+            {filteredBestSellers.length > 0 ? (
+                filteredBestSellers.map((book, index) => <BestSellerCard key={book.id} book={book} onSelect={onSelectBook} index={index} />)
+            ) : (
+                <p className="text-gray-400 text-center py-8 animate-fade-in-up">No books found.</p>
+            )}
           </div>
         </section>
       </div>

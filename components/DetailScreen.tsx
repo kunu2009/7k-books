@@ -1,20 +1,36 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Book } from '../types';
 import Icon from './Icon';
 
 interface DetailScreenProps {
   book: Book;
   onBack: () => void;
+  onStartReading: (book: Book) => void;
 }
 
-const DetailScreen: React.FC<DetailScreenProps> = ({ book, onBack }) => {
+const DetailScreen: React.FC<DetailScreenProps> = ({ book, onBack, onStartReading }) => {
+  const [isExiting, setIsExiting] = useState(false);
+
+  const handleBackClick = () => {
+    setIsExiting(true);
+  };
+
+  useEffect(() => {
+    if (isExiting) {
+      const timer = setTimeout(() => {
+        onBack();
+      }, 300); // Corresponds to animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [isExiting, onBack]);
+
   return (
-    <div className="bg-gradient-to-b from-[#5E4A83] to-[#31254D] text-white min-h-screen">
+    <div className={`bg-gradient-to-b from-[#5E4A83] to-[#31254D] text-white min-h-screen ${isExiting ? 'animate-fade-out' : 'animate-fade-in'}`}>
       <div className="p-6">
         {/* Header */}
         <header className="flex justify-between items-center mb-8">
-          <button onClick={onBack} className="p-2 -ml-2">
+          <button onClick={handleBackClick} className="p-2 -ml-2">
             <Icon name="back" className="w-6 h-6" />
           </button>
           <h1 className="font-semibold">Detail Book</h1>
@@ -58,7 +74,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ book, onBack }) => {
       </div>
 
       {/* Description and Actions */}
-      <div className="bg-[#1F1F2B] p-6 rounded-t-3xl flex-grow">
+      <div className="bg-[#1F1F2B] p-6 rounded-t-3xl flex-grow min-h-[30vh]">
         <h3 className="text-xl font-bold mb-3">Description</h3>
         <p className="text-gray-400 text-sm leading-relaxed mb-8">
           {book.description}
@@ -67,7 +83,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ book, onBack }) => {
           <button className="p-4 bg-gray-800 rounded-lg text-gray-400 hover:text-white">
             <Icon name="bookmark" className="w-6 h-6" />
           </button>
-          <button className="flex-grow bg-[#FF7A51] text-black font-bold py-4 rounded-lg">
+          <button onClick={() => onStartReading(book)} className="flex-grow bg-[#FF7A51] text-black font-bold py-4 rounded-lg">
             Start Reading
           </button>
         </div>

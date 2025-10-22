@@ -1,4 +1,9 @@
 
+export interface Chapter {
+  title: string;
+  content: string;
+}
+
 export interface Book {
   id: number;
   title: string;
@@ -11,4 +16,5 @@ export interface Book {
   language: string;
   tags: string[];
   description: string;
+  chapters: Chapter[];
 }
