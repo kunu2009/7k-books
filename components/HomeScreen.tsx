@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { Book } from '../types';
 import { MY_BOOKS, BEST_SELLERS } from '../constants';
@@ -77,7 +78,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectBook }) => {
         <header className="flex justify-between items-center mb-6">
           <div>
             <p className="text-sm text-gray-400">Good Morning</p>
-            <h1 className="text-2xl font-bold">Batricia Salfiora</h1>
+            <h1 className="text-2xl font-bold">Reader</h1>
           </div>
           <button className="bg-gradient-to-r from-orange-500 to-yellow-400 text-black text-sm font-bold py-2 px-4 rounded-full flex items-center">
             <span className="font-serif font-extrabold mr-1">K</span> 240 point
