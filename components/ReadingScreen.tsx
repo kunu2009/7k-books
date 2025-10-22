@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import type { Book } from '../types';
 import Icon from './Icon';
@@ -49,23 +48,34 @@ const parseMarkdown = (text: string): string => {
 const ReadingScreen: React.FC<ReadingScreenProps> = ({ book, onBack }) => {
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [showChapterList, setShowChapterList] = useState(false);
+  const [isClosingChapterList, setIsClosingChapterList] = useState(false);
+  const [contentAnimation, setContentAnimation] = useState('animate-fade-in');
   const contentRef = useRef<HTMLDivElement>(null);
 
   const chapter = book.chapters[currentChapterIndex];
   const renderedContent = useMemo(() => parseMarkdown(chapter.content), [chapter]);
 
   const goToChapter = (index: number) => {
-    if (index >= 0 && index < book.chapters.length) {
-      setCurrentChapterIndex(index);
+    if (index >= 0 && index < book.chapters.length && index !== currentChapterIndex) {
+      setContentAnimation('animate-fade-out');
+      setTimeout(() => {
+        setCurrentChapterIndex(index);
+        setShowChapterList(false);
+        contentRef.current?.scrollTo(0, 0);
+        setContentAnimation('animate-fade-in');
+      }, 300); // Duration of fade-out animation
+    } else {
       setShowChapterList(false);
-      contentRef.current?.scrollTo(0, 0);
     }
   };
-  
-  useEffect(() => {
-    // Scroll to top when chapter changes
-    contentRef.current?.scrollTo(0, 0);
-  }, [currentChapterIndex]);
+
+  const handleCloseChapterList = () => {
+    setIsClosingChapterList(true);
+    setTimeout(() => {
+        setShowChapterList(false);
+        setIsClosingChapterList(false);
+    }, 300); // Animation duration
+  };
 
   return (
     <div className="bg-[#1F1F2B] text-gray-400 min-h-screen flex flex-col animate-fade-in">
@@ -84,7 +94,7 @@ const ReadingScreen: React.FC<ReadingScreenProps> = ({ book, onBack }) => {
       </header>
       
       {/* Content */}
-      <main ref={contentRef} className="flex-grow overflow-y-auto p-6">
+      <main ref={contentRef} className={`flex-grow overflow-y-auto p-6 ${contentAnimation}`}>
         <h2 className="text-3xl font-bold text-white mb-6 text-center">{chapter.title}</h2>
         <div dangerouslySetInnerHTML={{ __html: renderedContent }} className="prose prose-invert" />
       </main>
@@ -112,11 +122,17 @@ const ReadingScreen: React.FC<ReadingScreenProps> = ({ book, onBack }) => {
 
       {/* Chapter List Modal */}
       {showChapterList && (
-        <div className="fixed inset-0 bg-black/60 z-30 flex flex-col justify-end animate-fade-in" onClick={() => setShowChapterList(false)}>
-          <div className="bg-[#2A2A39] rounded-t-2xl max-h-[70vh] flex flex-col animate-fade-in-up" onClick={e => e.stopPropagation()}>
+        <div 
+          className={`fixed inset-0 bg-black/60 z-30 flex flex-col justify-end ${isClosingChapterList ? 'animate-fade-out' : 'animate-fade-in'}`}
+          onClick={handleCloseChapterList}
+        >
+          <div 
+            className={`bg-[#2A2A39] rounded-t-2xl max-h-[70vh] flex flex-col ${isClosingChapterList ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}
+            onClick={e => e.stopPropagation()}
+          >
             <div className="p-4 border-b border-gray-700 flex justify-between items-center">
                 <h2 className="text-lg font-bold text-white">Chapters</h2>
-                <button onClick={() => setShowChapterList(false)}><Icon name="close" className="w-6 h-6 text-gray-400" /></button>
+                <button onClick={handleCloseChapterList}><Icon name="close" className="w-6 h-6 text-gray-400" /></button>
             </div>
             <ul className="overflow-y-auto p-2">
               {book.chapters.map((chap, index) => (
