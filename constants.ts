@@ -1,4 +1,3 @@
-
 import type { Book, Chapter } from './types';
 
 const CULTURES_AND_CODES_CONTENT = `
@@ -1353,6 +1352,7 @@ Design for user flows where provenance is discoverable within two clicks from pu
 - Story vs. Labor value
     - Avoid trading emotional or cultural narratives for one-off payments. Recognize labor and intellectual contribution as ongoing assets.
 - Avoiding token gestures
+    
     - A single signature line or small donation is not a substitute for structural benefit. Design partnerships with measurable outcomes.
 
 Practical mitigation: require a minimum benefit threshold for collaborations, scaled by projected revenues and visibility.
@@ -2303,7 +2303,7 @@ const book1: Book = {
   id: 1,
   title: 'Cultures and Codes',
   author: 'R. K. Sharma',
-  coverUrl: 'https://storage.googleapis.com/aistudio-marketplace/gallery/b285a3299cad524cf1b24135e6912389',
+  coverUrl: 'https://storage.googleapis.com/aistudio-marketplace/gallery/5a76722f7169062325d76a5964f9b878.png',
   progress: 65,
   timeLeft: '3h 45m left',
   rating: 4.8,
@@ -2318,7 +2318,7 @@ const book2: Book = {
   id: 2,
   title: 'The Kupam Games',
   author: 'Vikram Singh',
-  coverUrl: 'https://storage.googleapis.com/aistudio-marketplace/gallery/e5a2b192931a2d586232598c1152d3a3',
+  coverUrl: 'https://storage.googleapis.com/aistudio-marketplace/gallery/53549720b08573229b0532e05740411b.png',
   rating: 4.5,
   pages: 280,
   language: 'English',
